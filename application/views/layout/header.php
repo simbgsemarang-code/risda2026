@@ -42,7 +42,7 @@
 }
 .navbar-solid .navbar-nav .nav-link {
     padding: 6px 11px !important;
-    font-size: 0.85rem;
+    font-size: calc(0.85rem + 2px);
 }
 
 /* Link Styling untuk text biasa */
@@ -50,7 +50,7 @@
     font-family: 'Poppins', sans-serif;
     color: #ffffff !important;
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: calc(0.95rem + 2px);
     padding: 8px 13px !important;
     margin-left: 0.25rem;
     border: 1px solid transparent !important;
@@ -64,7 +64,7 @@
         padding-left: 7px !important;
         padding-right: 7px !important;
         margin-left: 0.1rem;
-        font-size: 0.76rem;
+        font-size: calc(0.76rem + 2px);
     }
 }
 .navbar-nav .nav-link:hover {
