@@ -18,7 +18,7 @@
 <!-- Bootstrap css -->
 <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css') ?>">
 <!-- Icomoon Font Icons css -->
-<link rel="stylesheet" href="<?= base_url('assets/fonts/style.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/fonts/style.css') ?>?v=<?= filemtime(FCPATH . 'assets/fonts/style.css') ?>">
 <!-- Main css -->
 <link rel="stylesheet" href="<?= base_url('assets/css/main.min.css') ?>">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />

@@ -1,17 +1,18 @@
 @font-face {
 	font-family: "icomoon";
-	src: url("http://localhost/risda2026/assets/fonts/icomoon.eot?7qthrd");
+	src: url("icomoon.eot?7qthrd");
 	src:
-		url("http://localhost/risda2026/assets/fonts/icomoon.eot?7qthrd#iefix")
+		url("icomoon.eot?7qthrd#iefix")
 			format("embedded-opentype"),
-		url("http://localhost/risda2026/assets/fonts/icomoon.ttf?7qthrd")
+		url("icomoon.ttf?7qthrd")
 			format("truetype"),
-		url("http://localhost/risda2026/assets/fonts/icomoon.woff?7qthrd")
+		url("icomoon.woff?7qthrd")
 			format("woff"),
-		url("http://localhost/risda2026/assets/fonts/icomoon.svg?7qthrd#icomoon")
+		url("icomoon.svg?7qthrd#icomoon")
 			format("svg");
 	font-weight: normal;
 	font-style: normal;
+	font-display: block;
 }
 
 [class^="icon-"],
