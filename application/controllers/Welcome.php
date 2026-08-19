@@ -17,7 +17,7 @@ class Welcome extends CI_Controller
 		$dataisi['Judul'] = '';
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$a,$b,$b,$b,$b,$b,$b,$b];
+		$dataisi['c'] = [$a,$b,$b,$b,$b,$b,$b,$b,$b];
 		$data['isi'] = $this->load->view('index.php', $dataisi, TRUE);
 		$this->load->view('layout/index', $data);
 	}
@@ -63,7 +63,7 @@ class Welcome extends CI_Controller
 	public function drainase() {
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$b,$b,$a,$b,$b,$b,$b,$b];
+		$dataisi['c'] = [$b,$b,$a,$b,$b,$b,$b,$b,$b];
 		$kecamatan =  $this->Buka_peta->peta('kecamatan', null, null, 'MultiPolygon');
 		$desa =  $this->Buka_peta->peta('desa_drainase', null, null, 'MultiPolygon');
 		$dataisi['kecamatan'] = $kecamatan[0];
@@ -94,7 +94,7 @@ class Welcome extends CI_Controller
 	public function pembuang() {
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$b,$b,$b,$a,$b,$b,$b,$b];
+		$dataisi['c'] = [$b,$b,$b,$a,$b,$b,$b,$b,$b];
 		$kecamatan =  $this->Buka_peta->peta('kecamatan', null, null, 'MultiPolygon');
 		$desa =  $this->Buka_peta->peta('desa', null, null, 'MultiPolygon');
 		$dataisi['kecamatan'] = $kecamatan[0];
@@ -127,7 +127,7 @@ class Welcome extends CI_Controller
 	public function air_baku() {
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$b,$b,$b,$b,$a,$b,$b,$b];
+		$dataisi['c'] = [$b,$b,$b,$b,$a,$b,$b,$b,$b];
 		$kecamatan =  $this->Buka_peta->peta('kecamatan', null, null, 'MultiPolygon');
 		$desa =  $this->Buka_peta->peta('desa', null, null, 'MultiPolygon');
 		$dataisi['kecamatan'] = $kecamatan[0];
@@ -161,7 +161,7 @@ class Welcome extends CI_Controller
 		ini_set('memory_limit', '8192M');
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$b,$a,$b,$b,$b,$b,$b,$b];
+		$dataisi['c'] = [$b,$a,$b,$b,$b,$b,$b,$b,$b];
 		$kecamatan =  $this->Buka_peta->peta('kecamatan', null, null, 'MultiPolygon');
 		$dataisi['kecamatan'] = $kecamatan[0];
 		$dataisi['desa'] = '';
@@ -196,7 +196,7 @@ class Welcome extends CI_Controller
 		ini_set('memory_limit', '8192M');
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$b,$b,$b,$b,$b,$a,$b,$b];
+		$dataisi['c'] = [$b,$b,$b,$b,$b,$a,$b,$b,$b];
 		$kecamatan =  $this->Buka_peta->peta('kecamatan', null, null, 'MultiPolygon');
 		$desa =  $this->Buka_peta->peta('desa', null, null, 'MultiPolygon');
 		$dataisi['kecamatan'] = $kecamatan[0];
@@ -813,7 +813,7 @@ class Welcome extends CI_Controller
 	
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		$dataisi['c'] = [$b,$b,$b,$b,$b,$b,$a,$b];
+		$dataisi['c'] = [$b,$b,$b,$b,$b,$b,$a,$b,$b];
 
 		
 		$dataisi['title'] = "STATISTIK";
@@ -958,6 +958,95 @@ class Welcome extends CI_Controller
 		
 		
 	}
+	public function buku_petunjuk()
+	{
+		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
+		$b = 'nav-item nav-link';
+		$now = time();
+		$unlockedAt = (int) $this->session->userdata('buku_petunjuk_unlocked_at');
+		$unlocked = $unlockedAt > 0 && ($now - $unlockedAt) < 7200;
+		$error = '';
+
+		if ($this->input->method(TRUE) === 'POST' && !$unlocked) {
+			$token = (string) $this->input->post('buku_token', TRUE);
+			$sessionToken = (string) $this->session->userdata('buku_petunjuk_token');
+			$blockedUntil = (int) $this->session->userdata('buku_petunjuk_blocked_until');
+
+			if ($blockedUntil > $now) {
+				$error = 'Terlalu banyak percobaan. Silakan tunggu sebentar.';
+			} elseif ($sessionToken === '' || !hash_equals($sessionToken, $token)) {
+				$error = 'Sesi formulir tidak valid. Silakan muat ulang halaman.';
+			} else {
+				$password = (string) $this->input->post('password', FALSE);
+				$passwordHash = '$2y$10$79nTQaTB2pUeUmXl4uAkDO56srlnUusAFb4R3buGjjqTLVx/d1ZLi';
+
+				if (password_verify($password, $passwordHash)) {
+					$this->session->sess_regenerate(TRUE);
+					$this->session->set_userdata('buku_petunjuk_unlocked_at', $now);
+					$this->session->unset_userdata(array(
+						'buku_petunjuk_attempts',
+						'buku_petunjuk_blocked_until',
+						'buku_petunjuk_token'
+					));
+					redirect('Welcome/buku_petunjuk');
+					return;
+				}
+
+				$attempts = (int) $this->session->userdata('buku_petunjuk_attempts') + 1;
+				if ($attempts >= 5) {
+					$this->session->set_userdata('buku_petunjuk_blocked_until', $now + 60);
+					$attempts = 0;
+				}
+				$this->session->set_userdata('buku_petunjuk_attempts', $attempts);
+				$error = 'Password yang dimasukkan salah.';
+			}
+		}
+
+		if (!$unlocked) {
+			$token = bin2hex(random_bytes(32));
+			$this->session->set_userdata('buku_petunjuk_token', $token);
+		} else {
+			$token = '';
+		}
+
+		$dataisi['c'] = [$b,$b,$b,$b,$b,$b,$b,$a,$b];
+		$dataisi['title'] = 'Buku Petunjuk';
+		$dataisi['unlocked'] = $unlocked;
+		$dataisi['error'] = $error;
+		$dataisi['buku_token'] = $token;
+		$data['isi'] = $this->load->view('buku_petunjuk', $dataisi, TRUE);
+		$this->load->view('layout/index', $data);
+	}
+
+	public function manual_book()
+	{
+		$unlockedAt = (int) $this->session->userdata('buku_petunjuk_unlocked_at');
+		if ($unlockedAt < 1 || (time() - $unlockedAt) >= 7200) {
+			$this->session->unset_userdata('buku_petunjuk_unlocked_at');
+			redirect('Welcome/buku_petunjuk');
+			return;
+		}
+
+		$file = APPPATH . 'private/Manual-Book.pdf';
+		if (!is_file($file) || !is_readable($file)) {
+			show_error('Buku petunjuk tidak tersedia.', 404);
+			return;
+		}
+
+		while (ob_get_level() > 0) {
+			ob_end_clean();
+		}
+		header('Content-Type: application/pdf');
+		header('Content-Disposition: inline; filename="Manual-Book-RISDA.pdf"');
+		header('Content-Length: ' . filesize($file));
+		header('Cache-Control: private, no-store, max-age=0');
+		header('Pragma: no-cache');
+		header('X-Content-Type-Options: nosniff');
+		header('X-Frame-Options: SAMEORIGIN');
+		readfile($file);
+		exit;
+	}
+
 	public function login()
 	{
 		
@@ -969,7 +1058,7 @@ class Welcome extends CI_Controller
 		}
 		$datacontent['alert'] = $login_error;
 
-		$dataisi['c'] = [$b,$b,$b,$b,$b,$b,$b,$a];
+		$dataisi['c'] = [$b,$b,$b,$b,$b,$b,$b,$b,$a];
 		$dataisi['alert'] = $login_error;
 
 		$dataisi['bar'] = ['0', '0', '0', '0', '0', '0', '1'];

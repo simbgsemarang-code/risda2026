@@ -288,7 +288,8 @@ $navbar_class = $is_home ? 'navbar-transparent' : 'navbar-solid shadow-sm';
                 <a href="<?= base_url('Welcome/air_baku') ?>" class="<?= $c[4] ?>">Air Baku</a>
                 <a href="<?= base_url('Welcome/digital') ?>" class="<?= $c[5] ?>">Peta Digital</a>
                 <a href="<?= base_url('Welcome/statistik/all/no') ?>" class="<?= $c[6] ?>">Statistik</a>
-                <a href="<?= base_url('Welcome/login') ?>" class="<?= isset($c[7]) ? $c[7] : 'nav-item nav-link' ?>">Login</a>
+                <a href="<?= base_url('Welcome/buku_petunjuk') ?>" class="<?= isset($c[7]) ? $c[7] : 'nav-item nav-link' ?>">Buku Petunjuk</a>
+                <a href="<?= base_url('Welcome/login') ?>" class="<?= isset($c[8]) ? $c[8] : 'nav-item nav-link' ?>">Login</a>
             </div>
         </div>
     </nav>
