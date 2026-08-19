@@ -174,7 +174,7 @@
             </div>
             <?php endif; ?>
 
-            <form action="<?= base_url('Admin/Login/authentication') ?>" method="post">
+            <form action="<?= base_url('Admin/Login/authentication') ?>" method="post" autocomplete="off">
                 <!-- Username -->
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small text-uppercase mb-2"><i class="fas fa-user text-success me-2"></i>Nama Pengguna</label>
@@ -200,7 +200,7 @@
                         <span class="fs-4 fw-bold text-dark font-monospace" style="letter-spacing: 5px; word-break: break-all; user-select: none;" onmousedown='return false;' onselectstart='return false;'><?= $captcha ?></span>
                     </div>
                     
-                    <input type="text" name="cap" class="form-control login-input text-center" placeholder="Ketik kode di atas" required>
+                    <input type="text" name="cap" class="form-control login-input text-center" placeholder="Ketik kode di atas" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore required>
                 </div>
 
                 <!-- Submit Button -->
