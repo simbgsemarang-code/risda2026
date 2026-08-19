@@ -619,6 +619,13 @@ function point_p_irigasi1(feature, latlng) {
         }
     });
 
+    // Tampilkan ringkasan awal yang tetap ringan. Layer besar lainnya tetap
+    // dimuat hanya saat dipilih melalui kontrol layer atau formulir filter.
+    map.addLayer(kecamatan);
+    map.addLayer(bendung);
+    loadLayerOnce(lazyLayers[0]);
+    loadLayerOnce(lazyLayers[3]);
+
     lc = L.control.locate({
         strings: {
             title: "Lokasi Anda"
