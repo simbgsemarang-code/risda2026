@@ -193,40 +193,20 @@ class Welcome extends CI_Controller
 	}
 	public function digital()
 	{
-		ini_set('memory_limit', '8192M');
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
 		$dataisi['c'] = [$b,$b,$b,$b,$b,$a,$b,$b,$b];
-		$kecamatan =  $this->Buka_peta->peta('kecamatan', null, null, 'MultiPolygon');
-		$desa =  $this->Buka_peta->peta('desa', null, null, 'MultiPolygon');
-		$dataisi['kecamatan'] = $kecamatan[0];
-		$dataisi['desa'] = $desa[0];
-		$uptd = $this->Buka_peta->peta('uptd', null, null, 'MultiPolygon');
-		$dataisi['uptd'] = $uptd[0];
-		$bendung = $this->Buka_peta->peta('bendung', null, null, 'Point');
-		$dataisi['bendung'] = $bendung[0];
-		$irigasi = $this->Buka_peta->peta('irigasi', null, null, 'MultiLineString');
-		$dataisi['irigasi'] = $irigasi[0];
-		$p_irigasi = $this->Buka_peta->peta('p_irigasi', null, null, 'Point');
-		$dataisi['p_irigasi'] = $p_irigasi[0];
-		$sawah = $this->Buka_peta->peta('sawah', null, null, 'MultiPolygon');
-		$dataisi['sawah'] = $sawah[0];
-		$drainase =  $this->Buka_peta->peta('drainase', null, null, 'MultiLineString');
-		$dataisi['drainase'] = $drainase[0];
-		$pembuang =  $this->Buka_peta->peta('saluran_pembuang', null, null, 'MultiLineString');
-		$dataisi['pembuang'] = $pembuang[0];
-		$p_irigasi1 = $this->Buka_peta->peta('pelengkap_pembuang', null, null, 'Point');
-		$dataisi['p_irigasi1'] = $p_irigasi1[0];
-		$airbaku = $this->Buka_peta->peta('sumur', null, null, 'Point');
-		$dataisi['airbaku'] = $airbaku[0];
 		$dataisi['Judul'] = '';
-		$dataisi['bendung1'] = $this->Buka_peta->frd('bendung', null, null);
-		$dataisi['drainase1'] = $this->Buka_peta->frd('drainase', null, null);
-		$dataisi['pembuang1'] = $this->Buka_peta->frd('saluran_pembuang', null, null);
-		$dataisi['pelengkap'] = $this->Buka_peta->frd('pelengkap_pembuang', null, null);
-		$dataisi['airbaku1'] = $this->Buka_peta->frd('sumur', null, null);
-		$dataisi['kecamatan1'] = $this->Buka_peta->frd('kecamatan', null, null);
-		$dataisi['uptd1'] = $this->Buka_peta->frd('uptd', null, null);
+
+		// Dropdown hanya membutuhkan kolom teks. Mengambil geojson di sini membuat
+		// halaman awal puluhan MB dan memaksa semua layer digambar sekaligus.
+		$dataisi['kecamatan1'] = $this->db->select('id, KECAMATAN')->order_by('KECAMATAN', 'ASC')->get('kecamatan')->result();
+		$dataisi['uptd1'] = $this->db->select('id, uptd')->order_by('uptd', 'ASC')->get('uptd')->result();
+		$dataisi['bendung1'] = $this->db->select('id_di, NAMA_DI')->distinct()->order_by('NAMA_DI', 'ASC')->get('bendung')->result();
+		$dataisi['drainase1'] = $this->db->select('id, NAMAOBJ')->order_by('NAMAOBJ', 'ASC')->get('drainase')->result();
+		$dataisi['pembuang1'] = $this->db->select('id, nama_saluran')->order_by('nama_saluran', 'ASC')->get('saluran_pembuang')->result();
+		$dataisi['pelengkap'] = $this->db->select('id, NAME')->order_by('NAME', 'ASC')->get('pelengkap_pembuang')->result();
+		$dataisi['airbaku1'] = $this->db->select('id, SumberDana')->order_by('SumberDana', 'ASC')->get('sumur')->result();
 		$data['isi'] = $this->load->view('digital.php', $dataisi, TRUE);
 		$this->load->view('layout/index', $data);
 	}
@@ -246,11 +226,17 @@ class Welcome extends CI_Controller
 	public function layer_di($name = '')
 	{
 		$layers = array(
+			'kecamatan' => array('kecamatan', 'MultiPolygon'),
 			'desa' => array('desa', 'MultiPolygon'),
 			'uptd' => array('uptd', 'MultiPolygon'),
+			'bendung' => array('bendung', 'Point'),
 			'irigasi' => array('irigasi', 'MultiLineString'),
 			'p_irigasi' => array('p_irigasi', 'Point'),
 			'sawah' => array('sawah', 'MultiPolygon'),
+			'drainase' => array('drainase', 'MultiLineString'),
+			'saluran_pembuang' => array('saluran_pembuang', 'MultiLineString'),
+			'pelengkap_pembuang' => array('pelengkap_pembuang', 'Point'),
+			'sumur' => array('sumur', 'Point'),
 		);
 		if (!isset($layers[$name])) show_404();
 
@@ -279,24 +265,11 @@ class Welcome extends CI_Controller
 	}
 	public function cari_di($val)
 	{
-		$kec = $this->Buka_peta->frd('bendung', $val, 'id_di');
-		$o = array();
-		$tipe = 'Point';
-		foreach ($kec as $h) {
-			$map_nya = array();
-			foreach ($h as $key => $val) {
-				if ($key != 'geojson') {
-					$map = array($key => $val);
-					$map_nya = array_merge($map_nya, $map);
-				}
-			}
-
-			$geom = array("type" => $tipe, "coordinates" => json_decode($h->geojson));
-			$has  = array("type" => "Feature", "properties" => $map_nya, "geometry" => $geom);
-			array_push($o, $has);
-		}
-
-		echo json_encode($o);
+		$data = $this->Buka_peta->peta('bendung', $val, 'id_di', 'Point');
+		$this->output
+			->set_content_type('application/json')
+			->set_header('Cache-Control: private, max-age=120')
+			->set_output('[' . $data[0] . ']');
 	}
 
 	public function cari_desa($val='',$jenis='')
@@ -401,24 +374,22 @@ class Welcome extends CI_Controller
 	}
 	public function cari_iri($val,$tabel,$jns)
 	{
-		$kec = $this->Buka_peta->frd($tabel, $val, 'id');
-		$o = array();
-		$tipe = $jns;
-		foreach ($kec as $h) {
-			$map_nya = array();
-			foreach ($h as $key => $val) {
-				if ($key != 'geojson') {
-					$map = array($key => $val);
-					$map_nya = array_merge($map_nya, $map);
-				}
-			}
-
-			$geom = array("type" => $tipe, "coordinates" => json_decode($h->geojson));
-			$has  = array("type" => "Feature", "properties" => $map_nya, "geometry" => $geom);
-			array_push($o, $has);
+		$allowed = array(
+			'irigasi' => 'MultiLineString',
+			'saluran_pembuang' => 'MultiLineString',
+			'drainase' => 'MultiLineString',
+			'p_irigasi' => 'Point',
+		);
+		if (!isset($allowed[$tabel])) {
+			show_error('Layer tidak valid.', 400);
+			return;
 		}
 
-		echo json_encode($o);
+		$data = $this->Buka_peta->peta($tabel, $val, 'id', $allowed[$tabel]);
+		$this->output
+			->set_content_type('application/json')
+			->set_header('Cache-Control: private, max-age=120')
+			->set_output('[' . $data[0] . ']');
 	}
 	public function configur()
 	{

@@ -296,7 +296,7 @@ $( document ).ready(function() {
     }
     function des(feature, layer) {
         layer.bindTooltip('Desa. ' + feature.properties['DESA'], {
-            permanent: true,
+            permanent: false,
             direction: "center",
             className: "label_des"
         });
@@ -304,7 +304,7 @@ $( document ).ready(function() {
     }
     function kec(feature, layer) {
         layer.bindTooltip(feature.properties['KECAMATAN'], {
-            permanent: true,
+            permanent: false,
             direction: "center",
             className: "label_kec"
         });
@@ -327,7 +327,7 @@ $( document ).ready(function() {
 
         }
         l.bindTooltip(f.properties['NAMA_DI'], {
-            permanent: true,
+            permanent: false,
             direction: "center",
             className: "label_des"
         });
@@ -416,7 +416,7 @@ function point_p_irigasi1(feature, latlng) {
     function onEachFeatureupt(feature, layer) {
 
         layer.bindTooltip('UPTD ' + feature.properties['UPTD'], {
-            permanent: true,
+            permanent: false,
             direction: "center",
             className: "label_kec"
         });
@@ -487,46 +487,46 @@ function point_p_irigasi1(feature, latlng) {
                 }
             
         } 
-    var uptd = L.geoJSON([<?= $uptd ?>], {
+    var uptd = L.geoJSON(null, {
         style: gaya_uptd,
         onEachFeature: onEachFeatureupt
     });
-    var kecamatan = L.geoJSON([<?= $kecamatan ?>], {
+    var kecamatan = L.geoJSON(null, {
         style: gayakec,
         onEachFeature: kec
     });
-    var bendung = L.geoJSON([<?= $bendung ?>], {
+    var bendung = L.geoJSON(null, {
         onEachFeature: popbendung,
         pointToLayer: point_bendung
     });
-    var irigasi = L.geoJSON([<?= $irigasi ?>], {
+    var irigasi = L.geoJSON(null, {
          onEachFeature:popirigasi
     });
-    var p_irigasi = L.geoJSON([<?= $p_irigasi ?>], {
+    var p_irigasi = L.geoJSON(null, {
         pointToLayer: point_p_irigasi,
         onEachFeature:poppembuang1
     });
-    var sawah = L.geoJSON([<?= $sawah ?>], {
+    var sawah = L.geoJSON(null, {
         style: gayasawah,
         onEachFeature: popUp_sawah
     });
-    var desa = L.geoJSON([<?= $desa ?>], {
+    var desa = L.geoJSON(null, {
        style: gayakec,
         onEachFeature: des
     });
-    var drainase = L.geoJSON([<?= $drainase ?>], {
+    var drainase = L.geoJSON(null, {
        onEachFeature:popsaluranpembuang1,style:gaya_saluranPembuang1
     });
-    var pembuang = L.geoJSON([<?= $pembuang ?>], {
+    var pembuang = L.geoJSON(null, {
         style:gaya_saluranPembuang2,
         onEachFeature:popsaluranpembuang2
     });
-    var p_irigasi1 = L.geoJSON([<?= $p_irigasi1 ?>], {
+    var p_irigasi1 = L.geoJSON(null, {
         pointToLayer: point_p_irigasi1,
         onEachFeature:poppembuang2
     });
 
-    var airbaku = L.geoJSON([<?= $airbaku ?>], {
+    var airbaku = L.geoJSON(null, {
         pointToLayer: point_air,
         onEachFeature:popair
     });
@@ -537,7 +537,7 @@ function point_p_irigasi1(feature, latlng) {
         fullscreenControlOptions: {
             position: 'topleft'
         },
-        layers: [googleSat, kecamatan,uptd,  bendung, irigasi, sawah,drainase,pembuang,airbaku]
+        layers: [googleSat]
     });
     var baseLayers = {
         "Google Roadmap": googleStreets,
@@ -573,6 +573,52 @@ function point_p_irigasi1(feature, latlng) {
     L.control.groupedLayers(baseLayers, groupedOverlays, {
         collapsed: true
     }).addTo(map);
+
+    // Layer berat dimuat satu kali ketika pengguna benar-benar memilihnya.
+    var lazyLayers = [
+        { layer: kecamatan, name: 'kecamatan' },
+        { layer: desa, name: 'desa' },
+        { layer: uptd, name: 'uptd' },
+        { layer: bendung, name: 'bendung' },
+        { layer: irigasi, name: 'irigasi' },
+        { layer: p_irigasi, name: 'p_irigasi' },
+        { layer: sawah, name: 'sawah' },
+        { layer: drainase, name: 'drainase' },
+        { layer: pembuang, name: 'saluran_pembuang' },
+        { layer: p_irigasi1, name: 'pelengkap_pembuang' },
+        { layer: airbaku, name: 'sumur' }
+    ];
+
+    function loadLayerOnce(entry) {
+        if (entry.loaded || entry.loading) return;
+        entry.loading = true;
+
+        $.ajax({
+            url: '<?= base_url('Welcome/layer_di/') ?>' + entry.name,
+            dataType: 'json',
+            cache: true
+        }).done(function (features) {
+            entry.layer.addData(features || []);
+            entry.loaded = true;
+            lastZoomBucket = null;
+            updateZoomStyles();
+        }).fail(function () {
+            if (map.hasLayer(entry.layer)) map.removeLayer(entry.layer);
+            show_alert('Layer gagal dimuat. Silakan coba kembali.');
+        }).always(function () {
+            entry.loading = false;
+        });
+    }
+
+    map.on('overlayadd', function (event) {
+        for (var i = 0; i < lazyLayers.length; i++) {
+            if (lazyLayers[i].layer === event.layer) {
+                loadLayerOnce(lazyLayers[i]);
+                break;
+            }
+        }
+    });
+
     lc = L.control.locate({
         strings: {
             title: "Lokasi Anda"
@@ -609,202 +655,58 @@ function point_p_irigasi1(feature, latlng) {
             }
          }
     }
-    map.on('zoomend', onZoomend1);
-    function onZoomend1(feature, layer) {
-        var currentZoom = map.getZoom();
-        var tooltip = $('.label_des');
-        var tooltipdes = $('.label_des');
-        bendung.eachLayer(function(bendung) {
-            var kondisi = bendung.feature.properties.KONDISI;
-            console.log(currentZoom);
-            var icon = getkondisi(kondisi);
-            var Url_nya = "<?= base_url('assets/images/') ?>" +icon;
-            var Icon0 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [15, 17],
+    var bendungIconCache = {};
+    var pelengkapIconCache = {};
+    var lastZoomBucket = null;
+
+    function zoomBucket(zoom) {
+        if (zoom <= 11) return 0;
+        if (zoom <= 13) return 1;
+        if (zoom <= 15) return 2;
+        if (zoom <= 18) return 3;
+        return 4;
+    }
+
+    function cachedBendungIcon(kondisi, bucket) {
+        var key = kondisi + ':' + bucket;
+        if (!bendungIconCache[key]) {
+            var sizes = [[15, 17], [20, 23], [25, 27], [35, 38], [45, 48]];
+            bendungIconCache[key] = L.icon({
+                iconUrl: "<?= base_url('assets/images/') ?>" + getkondisi(kondisi),
+                iconSize: sizes[bucket]
             });
-            var Icon = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [20, 23],
+        }
+        return bendungIconCache[key];
+    }
+
+    function cachedPelengkapIcon(bucket) {
+        if (!pelengkapIconCache[bucket]) {
+            var sizes = [[7, 7], [10, 10], [12, 12], [20, 20], [35, 35]];
+            pelengkapIconCache[bucket] = L.icon({
+                iconUrl: "<?= base_url('assets/images/home.png') ?>",
+                iconSize: sizes[bucket]
             });
-            var Icon1 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [25, 27],
-            });
-            var Icon2 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [25, 27],
-            });
-            var Icon3 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [30, 33],
-            });
-            var Icon4 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [35, 38],
-            });
-            var Icon5 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [40, 43],
-            });
-            var Icon6 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [45, 48],
-            });
-            if (currentZoom <= 11) {
-                bendung.setIcon(Icon0);
-            }
-            if (currentZoom == 12) {
-                bendung.setIcon(Icon);
-            }
-            if (currentZoom == 13) {
-                bendung.setIcon(Icon1);
-            }
-             if (currentZoom < 14) {
-                tooltip.css('display', 'none');
-            }
-            if (currentZoom == 14) {
-                tooltip.css('display', 'block');
-                tooltip.css('font-size', 12);
-                bendung.setIcon(Icon2);
-            }
-            if (currentZoom == 15) {
-                tooltip.css('font-size', 12.5);
-                bendung.setIcon(Icon2);
-            }
-            if (currentZoom == 16) {
-                tooltip.css('font-size', 13);
-                bendung.setIcon(Icon3);
-            }
-            if (currentZoom == 17) {
-                 tooltip.css('font-size', 13.5);
-                bendung.setIcon(Icon4);
-            }
-            if (currentZoom == 18) {
-                tooltip.css('font-size', 14);
-               bendung.setIcon(Icon4);
-            }
-            if (currentZoom == 19) {
-                tooltip.css('font-size', 14.5);
-                bendung.setIcon(Icon5);
-            }
-            if (currentZoom >= 20) {
-                tooltip.css('font-size', 14.5);
-                bendung.setIcon(Icon6);
+        }
+        return pelengkapIconCache[bucket];
+    }
+
+    function updateZoomStyles() {
+        var zoom = map.getZoom();
+        var bucket = zoomBucket(zoom);
+        if (bucket === lastZoomBucket) return;
+        lastZoomBucket = bucket;
+
+        bendung.eachLayer(function (marker) {
+            if (marker.setIcon && marker.feature) {
+                marker.setIcon(cachedBendungIcon(marker.feature.properties.KONDISI, bucket));
             }
         });
-        p_irigasi.eachLayer(function(p_irigasi) {
-          
-            console.log(currentZoom);
-           
-            var Url_nya = "<?= base_url('assets/images/home.png') ?>" ;
-            var Icon0 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [7, 7],
-            });
-            var Icon = L.icon({
-                iconUrl: Url_nya,
-                iiconSize: [8, 8],
-            });
-            var Icon1 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [10, 10],
-            });
-            var Icon2 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [12, 12],
-            });
-            var Icon3 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [15, 15],
-            });
-            var Icon4 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [20, 20],
-            });
-            var Icon5 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [30, 30],
-            });
-            var Icon6 = L.icon({
-                iconUrl: Url_nya,
-                iconSize: [35, 35],
-            });
-            if (currentZoom <= 11) {
-                p_irigasi.setIcon(Icon0);
-            }
-            if (currentZoom == 12) {
-                p_irigasi.setIcon(Icon);
-            }
-            if (currentZoom == 13) {
-                p_irigasi.setIcon(Icon1);
-            }
-            
-            if (currentZoom == 14) {
-                p_irigasi.setIcon(Icon2);
-            }
-            if (currentZoom == 15) {
-                p_irigasi.setIcon(Icon2);
-            }
-            if (currentZoom == 16) {
-                p_irigasi.setIcon(Icon3);
-            }
-            if (currentZoom == 17) {
-                p_irigasi.setIcon(Icon4);
-            }
-            if (currentZoom == 18) {
-                p_irigasi.setIcon(Icon4);
-            }
-            if (currentZoom == 19) {
-                p_irigasi.setIcon(Icon5);
-            }
-            if (currentZoom >= 20) {
-                p_irigasi.setIcon(Icon6);
-            }
-        });
-        desa.eachLayer(function(desa) {
-            if (currentZoom <= 11) {
-                tooltipdes.css('display', 'none');
-                tooltipdes.css('font-size', 6);
-            }
-            if (currentZoom == 12) {
-                tooltipdes.css('display', 'none');
-                tooltipdes.css('font-size', 10);
-            }
-            if (currentZoom < 14) {
-                tooltipdes.css('display', 'none');
-                tooltipdes.css('font-size', 11);
-            }
-            if (currentZoom == 14) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 12);
-            }
-            if (currentZoom == 15) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 12);
-            }
-            if (currentZoom == 16) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 13);
-            }
-            if (currentZoom == 17) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 13);
-            }
-            if (currentZoom == 18) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 14);
-            }
-            if (currentZoom == 19) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 14);
-            }
-            if (currentZoom == 20) {
-                tooltipdes.css('display', 'block');
-                tooltipdes.css('font-size', 15);
-            }
+        p_irigasi.eachLayer(function (marker) {
+            if (marker.setIcon) marker.setIcon(cachedPelengkapIcon(bucket));
         });
     }
+
+    map.on('zoomend', updateZoomStyles);
 var legend_saluran = L.control({
     position: 'bottomleft'
 });
@@ -822,28 +724,35 @@ legend_saluran.onAdd = function(map) {
     return div;
 };
 legend_saluran.addTo(map);
+var activeResultLayer = null;
+
+function showFilteredResult(data, options, addToMap) {
+    if (activeResultLayer && map.hasLayer(activeResultLayer)) {
+        map.removeLayer(activeResultLayer);
+    }
+    activeResultLayer = L.geoJSON(data || [], options || {});
+    if (addToMap !== false) activeResultLayer.addTo(map);
+    var bounds = activeResultLayer.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [24, 24], maxZoom: 16 });
+}
+
 function cari_iri(a,tabel,jns) {
      $.ajax({
             url: '<?= base_url('Welcome/cari_iri/') ?>' + a +'/' + tabel +'/'+jns,
+            dataType: 'json',
+            cache: true,
             success: function(msg) {
-             
-                var geojsonFeature = JSON.parse(msg);
-                var on = {};
-                bd = L.geoJSON(geojsonFeature, on);
-                map.fitBounds(bd.getBounds());
+                showFilteredResult(msg, {}, true);
             }
         });
 }
 function cari_pel(a) {
      $.ajax({
             url: '<?= base_url('Welcome/cari_pel/') ?>' + a,
+            dataType: 'json',
+            cache: true,
             success: function(msg) {
-             
-                var geojsonFeature = JSON.parse(msg);
-                var on = {};
-                bd = L.geoJSON(geojsonFeature, on);
-                bd.addTo(map);
-                map.fitBounds(bd.getBounds());
+                showFilteredResult(msg, {}, true);
             }
         });
 }
@@ -853,12 +762,10 @@ function cari_sp(a) {
 function cari_di(a) {
     $.ajax({
         url: '<?= base_url('Welcome/cari_di/') ?>' + a,
+        dataType: 'json',
+        cache: true,
         success: function(msg) {
-            var geojsonFeature = JSON.parse(msg);
-            var on = {};
-            bd = L.geoJSON(geojsonFeature, on);
-            map.fitBounds(bd.getBounds());
-            bd.addTo(map);
+            showFilteredResult(msg, {}, true);
         }
     });
 }
