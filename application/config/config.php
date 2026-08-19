@@ -464,6 +464,12 @@ $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array();
 
+// Optional server-only overrides (encryption key, HTTPS cookies, base URL, etc.).
+$local_app_config = APPPATH . 'config/config.local.php';
+if (is_file($local_app_config)) {
+	require $local_app_config;
+}
+
 /*
 |--------------------------------------------------------------------------
 | Output Compression

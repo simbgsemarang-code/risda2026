@@ -30,6 +30,8 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 .env
 .env.*
 !.env.example
+/application/config/database.local.php
+/application/config/config.local.php
 
 # IDE Files
 #-------------------------

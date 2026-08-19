@@ -140,3 +140,10 @@ $db['remote'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+// Server-only credentials. This file is intentionally excluded from Git so
+// deployments can update the application without exposing or overwriting secrets.
+$local_database_config = APPPATH . 'config/database.local.php';
+if (is_file($local_database_config)) {
+	require $local_database_config;
+}
