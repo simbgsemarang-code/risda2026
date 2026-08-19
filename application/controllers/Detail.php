@@ -3,6 +3,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Detail extends CI_Controller
 {
+	private function first_coordinate_pair($coordinates)
+	{
+		if (!is_array($coordinates) || $coordinates === array()) {
+			return null;
+		}
+
+		if (count($coordinates) >= 2 && is_numeric($coordinates[0]) && is_numeric($coordinates[1])) {
+			return array((float) $coordinates[0], (float) $coordinates[1]);
+		}
+
+		foreach ($coordinates as $nested) {
+			$pair = $this->first_coordinate_pair($nested);
+			if ($pair !== null) {
+				return $pair;
+			}
+		}
+
+		return null;
+	}
+
 	private function feature_properties($mapData)
 	{
 		if (empty($mapData[1]) || empty($mapData[1][0])) {
@@ -140,10 +160,10 @@ class Detail extends CI_Controller
 		if (is_iterable($seratus)) {
 			foreach ($seratus as $j) {
 				$koor = json_decode($j->geojson, TRUE);
-				$koora = json_encode($koor[0][0][0]);
-				$koorb = json_encode($koor[0][0][1]);
-				$koordinat = $koorb . "," . $koora;
-				array_push($array_koor, $koordinat);
+				$pair = $this->first_coordinate_pair($koor);
+				if ($pair !== null) {
+					$array_koor[] = json_encode($pair[1]) . ',' . json_encode($pair[0]);
+				}
 			}
 		}
 		$p_irigasi= $this->Buka_peta->peta('p_irigasi', $ir[1][0]->id_di, 'id_di', 'Point');
@@ -186,10 +206,10 @@ class Detail extends CI_Controller
 		if (is_iterable($seratus)) {
 			foreach ($seratus as $j) {
 				$koor = json_decode($j->geojson, TRUE);
-				$koora = json_encode($koor[0][0][0]);
-				$koorb = json_encode($koor[0][0][1]);
-				$koordinat = $koorb . "," . $koora;
-				array_push($array_koor, $koordinat);
+				$pair = $this->first_coordinate_pair($koor);
+				if ($pair !== null) {
+					$array_koor[] = json_encode($pair[1]) . ',' . json_encode($pair[0]);
+				}
 			}
 		}
 	
