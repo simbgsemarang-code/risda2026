@@ -29,8 +29,8 @@ class Login extends CI_Controller {
 			$cap_val = (string) $this->session->userdata('login_captcha');
 			$this->session->unset_userdata('login_captcha');
 			if ($cap_val === '' || !hash_equals($cap_val, $cap)) {
-				$alert = 'Captcha Salah';
-				redirect('Welcome/login?al='.rawurlencode($alert));
+				$this->session->set_flashdata('login_error', 'Captcha salah. Silakan coba lagi.');
+				redirect('Welcome/login');
 				return;
 			}
 			
@@ -61,12 +61,16 @@ class Login extends CI_Controller {
 			
 				redirect('Admin/Index');
 				
-            }else{
-				$alert = 'Username atau Password Salah';
-				redirect('Welcome/masuk?al='.$alert);
+			}else{
+				$this->session->set_flashdata('login_error', 'Username atau password salah.');
+				redirect('Welcome/login');
+				return;
             }
          
-        }
+		} else {
+			$this->session->set_flashdata('login_error', 'Email dan kata sandi wajib diisi.');
+			redirect('Welcome/login');
+		}
 		
 	}
 

@@ -963,18 +963,14 @@ class Welcome extends CI_Controller
 		
 		$a = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
 		$b= 'nav-item nav-link';
-		if (isset($_GET['al'])) {
-			$datacontent['alert'] = $_GET['al'];
-		} else {
-			$datacontent['alert'] = '';
+		$login_error = $this->session->flashdata('login_error');
+		if (!$login_error) {
+			$login_error = (string) $this->input->get('al', true);
 		}
+		$datacontent['alert'] = $login_error;
 
 		$dataisi['c'] = [$b,$b,$b,$b,$b,$b,$b,$a];
-		if (isset($_GET['al'])) {
-			$dataisi['alert'] = $_GET['al'];
-		} else {
-			$dataisi['alert'] = '';
-		}
+		$dataisi['alert'] = $login_error;
 
 		$dataisi['bar'] = ['0', '0', '0', '0', '0', '0', '1'];
 		$dataisi['title'] = "Masuk Admin";
