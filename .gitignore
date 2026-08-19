@@ -1,0 +1,46 @@
+.DS_Store
+
+application/cache/*
+!application/cache/index.html
+
+application/logs/*
+!application/logs/index.html
+
+!application/*/.htaccess
+
+composer.lock
+tests/mocks/database/ci_test.sqlite
+
+user_guide_src/build/*
+user_guide_src/cilexer/build/*
+user_guide_src/cilexer/dist/*
+user_guide_src/cilexer/pycilexer.egg-info/*
+/vendor/
+
+# Local data, backups, and user-generated content
+/*.sql
+/*.zip
+/uploads/*
+!/uploads/.htaccess
+/assets/foto/*
+!/assets/foto/no_image.jpg
+**/.cagefs/
+**/.cl.selector/
+/diff_results.txt
+.env
+.env.*
+!.env.example
+
+# IDE Files
+#-------------------------
+/nbproject/
+.idea/*
+
+## Sublime Text cache files
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+/tests/tests/
+/tests/results/
