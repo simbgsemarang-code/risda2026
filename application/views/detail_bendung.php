@@ -143,21 +143,25 @@
 								$back = '#E9ECEF';
 								$kon = '-';
 								$textColor = 'black';
-                                if ($kd->KONDISI == 'Baik') {
+                                if ($kd->KONDISI == 'Baik Sekali') {
                                     $back = '#3B72BE';
                                     $kon = "BS";
 									$textColor = 'black';
-                                } elseif ($kd->KONDISI == 'Rusak Ringan') {
+								} elseif ($kd->KONDISI == 'Baik') {
                                     $back = '#008000';
                                     $kon = "B";
 									$textColor = 'white';
-                                } elseif ($kd->KONDISI == 'Rusak Sedang') {
+								} elseif ($kd->KONDISI == 'Rusak Ringan') {
+									$back = '#FD7E14';
+									$kon = "RR";
+									$textColor = 'black';
+								} elseif ($kd->KONDISI == 'Sedang' || $kd->KONDISI == 'Rusak Sedang') {
                                     $back = '#FFFF00';
 									$textColor = 'black';
                                     $kon = "S";
-                                } elseif ($kd->KONDISI == 'Rusak Berat') {
+								} elseif ($kd->KONDISI == 'Rusak Berat' || $kd->KONDISI == 'Buruk') {
                                     $back = '#FF0000';
-                                    $kon = "BR";
+                                    $kon = "RB";
 									$textColor = 'white';
                                 } 
                         ?>
@@ -447,7 +451,9 @@
             var c = '#3B72BE';
         }else if (k=='Baik') {
             var c = '#008000';
-        }else if (k=='Sedang') {
+        }else if (k=='Rusak Ringan') {
+            var c = '#FD7E14';
+        }else if (k=='Sedang' || k=='Rusak Sedang') {
             var c = '#FFFF00';
         }else{
             var c = '#FF0000';
@@ -795,14 +801,15 @@ var legend_saluran = L.control({
 
 legend_saluran.onAdd = function(map) {
     var div = L.DomUtil.create('div', 'info legend');
-    var grades = ["&nbsp;&nbsp;Baik Sekali", "&nbsp;&nbsp;Baik", "&nbsp;&nbsp;Sedang", "&nbsp;&nbsp;Buruk","&nbsp;&nbsp;Bangunan Pelengkap"];
+    var grades = ["&nbsp;&nbsp;Baik Sekali", "&nbsp;&nbsp;Baik", "&nbsp;&nbsp;Rusak Ringan", "&nbsp;&nbsp;Sedang", "&nbsp;&nbsp;Rusak Berat", "&nbsp;&nbsp;Bangunan Pelengkap"];
     var labels = ["<b>Legenda Kondisi</b><br>"];
     var from, to;
     labels.push('<img src="<?= base_url('assets/images/baik_sekali.png') ?>" width="20px">' + grades[0]);
     labels.push('<img src="<?= base_url('assets/images/baik.png') ?>" width="20px">' + grades[1]);
-    labels.push('<img src="<?= base_url('assets/images/sedang.png') ?>" width="20px">' + grades[2]);
-    labels.push('<img src="<?= base_url('assets/images/buruk.png') ?>" width="20px">' + grades[3]);    
-    labels.push('<img src="<?= base_url('assets/images/home.png') ?>" width="20px">' + grades[4]);                    
+    labels.push('<span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:#FD7E14;vertical-align:middle"></span>' + grades[2]);
+    labels.push('<img src="<?= base_url('assets/images/sedang.png') ?>" width="20px">' + grades[3]);
+    labels.push('<img src="<?= base_url('assets/images/buruk.png') ?>" width="20px">' + grades[4]);
+    labels.push('<img src="<?= base_url('assets/images/home.png') ?>" width="20px">' + grades[5]);
     div.innerHTML = labels.join(' ');
     return div;
 };
