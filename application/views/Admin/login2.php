@@ -89,6 +89,31 @@
     background: white;
     box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.1) !important;
 }
+.password-field {
+    position: relative;
+}
+.password-field .login-input {
+    padding-right: 52px;
+}
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #6c757d;
+}
+.password-toggle:hover,
+.password-toggle:focus-visible {
+    color: #198754;
+    background: rgba(25, 135, 84, 0.08);
+    outline: none;
+}
 .login-btn-submit {
     background: linear-gradient(135deg, #198754, #146c43);
     color: white;
@@ -159,7 +184,12 @@
                 <!-- Password -->
                 <div class="mb-4">
                     <label class="form-label text-muted fw-bold small text-uppercase mb-2"><i class="fas fa-lock text-success me-2"></i>Kata Sandi</label>
-                    <input type="password" name="pass" class="form-control login-input" placeholder="Masukkan kata sandi" required>
+                    <div class="password-field">
+                        <input type="password" id="login-password" name="pass" class="form-control login-input" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+                        <button type="button" id="password-toggle" class="password-toggle" aria-label="Tampilkan kata sandi" aria-pressed="false">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Captcha -->
@@ -181,3 +211,20 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    var password = document.getElementById('login-password');
+    var toggle = document.getElementById('password-toggle');
+    if (!password || !toggle) return;
+
+    toggle.addEventListener('click', function () {
+        var showing = password.type === 'text';
+        password.type = showing ? 'password' : 'text';
+        toggle.setAttribute('aria-pressed', showing ? 'false' : 'true');
+        toggle.setAttribute('aria-label', showing ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi');
+        toggle.querySelector('i').className = showing ? 'fas fa-eye' : 'fas fa-eye-slash';
+        password.focus({preventScroll: true});
+    });
+}());
+</script>
