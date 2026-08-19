@@ -41,8 +41,8 @@
     max-height: 38px !important;
 }
 .navbar-solid .navbar-nav .nav-link {
-    padding: 6px 20px !important;
-    font-size: 0.9rem;
+    padding: 6px 11px !important;
+    font-size: 0.85rem;
 }
 
 /* Link Styling untuk text biasa */
@@ -51,10 +51,21 @@
     color: #ffffff !important;
     font-weight: 500;
     font-size: 0.95rem;
-    padding: 8px 24px !important;
-    margin-left: 1rem;
+    padding: 8px 13px !important;
+    margin-left: 0.25rem;
     border: 1px solid transparent !important;
     border-radius: 50rem !important;
+    white-space: nowrap;
+}
+
+@media (min-width: 992px) and (max-width: 1399.98px) {
+    .navbar-nav .nav-link,
+    .navbar-solid .navbar-nav .nav-link {
+        padding-left: 7px !important;
+        padding-right: 7px !important;
+        margin-left: 0.1rem;
+        font-size: 0.76rem;
+    }
 }
 .navbar-nav .nav-link:hover {
     background: rgba(255, 255, 255, 0.15) !important;
