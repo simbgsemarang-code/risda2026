@@ -44,6 +44,10 @@ try {
                         <h2 class="text-white ms-3 mb-0" style="letter-spacing: 1px; font-weight: 700;">RISDA</h2>
                     </a>
                     <p class="text-light mb-0" style="line-height: 1.8; font-size: 0.95rem; opacity: 0.9;">Layanan Basis Data Sumber Daya Air<br>Dinas Pengelolaan Sumber Daya Air<br>Kabupaten Cilacap</p>
+                    <span class="visitor-counter text-light" title="Jumlah sesi pengunjung yang tercatat">
+                        <i class="fas fa-users" aria-hidden="true"></i>
+                        <span>Total Pengunjung: <strong><?= number_format($visitorTotal, 0, ',', '.') ?></strong></span>
+                    </span>
                 </div>
             </div>
 
@@ -107,10 +111,6 @@ try {
                 &copy; <?= date('Y'); ?> <a href="<?= base_url() ?>" class="text-white fw-bold text-decoration-none">RISDA</a>. Hak Cipta Dilindungi.
                 <br>
                 <small class="mt-2 d-block">Dinas Pengelolaan Sumber Daya Air Kabupaten Cilacap</small>
-                <span class="visitor-counter" title="Jumlah sesi pengunjung yang tercatat">
-                    <i class="fas fa-users" aria-hidden="true"></i>
-                    <span>Total Pengunjung: <strong><?= number_format($visitorTotal, 0, ',', '.') ?></strong></span>
-                </span>
             </div>
         </div>
     </div>
