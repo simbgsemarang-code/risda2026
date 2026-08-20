@@ -13,7 +13,27 @@
         color: #ffffff !important;
         letter-spacing: 1px;
     }
+    .visitor-counter {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 7px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50rem;
+        background: rgba(255, 255, 255, 0.1);
+    }
 </style>
+<?php
+$visitorTotal = 0;
+try {
+    $CI =& get_instance();
+    $CI->load->model('Visitor_model');
+    $visitorTotal = $CI->Visitor_model->record_and_count();
+} catch (Throwable $exception) {
+    log_message('error', 'Visitor counter error: ' . $exception->getMessage());
+}
+?>
 <div class="container-fluid new-footer py-5 wow fadeIn" data-wow-delay="0.2s">
     <div class="container py-4">
         <div class="row g-5">
@@ -87,6 +107,10 @@
                 &copy; <?= date('Y'); ?> <a href="<?= base_url() ?>" class="text-white fw-bold text-decoration-none">RISDA</a>. Hak Cipta Dilindungi.
                 <br>
                 <small class="mt-2 d-block">Dinas Pengelolaan Sumber Daya Air Kabupaten Cilacap</small>
+                <span class="visitor-counter" title="Jumlah sesi pengunjung yang tercatat">
+                    <i class="fas fa-users" aria-hidden="true"></i>
+                    <span>Total Pengunjung: <strong><?= number_format($visitorTotal, 0, ',', '.') ?></strong></span>
+                </span>
             </div>
         </div>
     </div>
