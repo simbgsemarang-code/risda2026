@@ -61,4 +61,7 @@ class Format extends BaseConfig
         'application/xml'  => 0,
         'text/xml'         => 0,
     ];
+
+    /** Maximum depth used by CI4's JSON response formatter. */
+    public int $jsonEncodeDepth = 512;
 }

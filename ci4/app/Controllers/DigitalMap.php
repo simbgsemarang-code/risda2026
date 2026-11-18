@@ -7,7 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class DigitalMap extends BaseController
 {
-    private const LAYERS = [
+    public const LAYERS = [
         'kecamatan'           => ['kecamatan', 'MultiPolygon'],
         'desa'                => ['desa', 'MultiPolygon'],
         'uptd'                => ['uptd', 'MultiPolygon'],

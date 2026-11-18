@@ -41,4 +41,38 @@ class MapModel extends Model
 
         return $features;
     }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function options(string $table, array $columns, ?string $whereColumn = null, mixed $whereValue = null): array
+    {
+        $builder = $this->db->table($table)->select($columns);
+        if ($whereColumn !== null) {
+            $builder->where($whereColumn, $whereValue);
+        }
+
+        return $builder->get()->getResultArray();
+    }
+
+    public function featureCount(string $table, ?string $field = null, mixed $value = null): int
+    {
+        $builder = $this->db->table($table);
+        if ($field !== null) {
+            $builder->where($field, $value);
+        }
+
+        return $builder->countAllResults();
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public function rows(string $table, ?string $field = null, mixed $value = null): array
+    {
+        $builder = $this->db->table($table);
+        if ($field !== null) {
+            $builder->where($field, $value);
+        }
+
+        return $builder->get()->getResultArray();
+    }
 }
