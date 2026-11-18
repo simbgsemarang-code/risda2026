@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Heavitas';
+    src: url('asset/fonts/Heavitas.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.text-title h1 {
+    font-family: 'Heavitas', 'Arial', sans-serif;
+    font-weight: normal;
+}
