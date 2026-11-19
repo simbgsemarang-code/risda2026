@@ -27,11 +27,13 @@ Options -Indexes
 	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
 
 	# Checks to see if the user is attempting to access a valid file,
-	# such as an image or css document, if this isn't true it sends the
-	# request to the front controller, index.php
+	# such as an image or css document. Requests are sent to the front
+	# controller without PATH_INFO. This is required by PHP-FPM/FastCGI
+	# hosts (including Plesk), which otherwise try to open a physical file
+	# named "index.php/<route>" and return "No input file specified".
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule ^([\s\S]*)$ index.php/$1 [L,NC,QSA]
+	RewriteRule ^ index.php [L,NC,QSA]
 
 	# Ensure Authorization header is passed along
 	RewriteCond %{HTTP:Authorization} .

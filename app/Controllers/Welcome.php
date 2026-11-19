@@ -20,6 +20,16 @@ class Welcome extends BaseController
         'p_irigasi' => ['p_irigasi', 'Point'],
     ];
 
+    /**
+     * Legacy public URL retained for links that were published while the
+     * application still used CI3. The digital map is the CI4 replacement and
+     * contains the drainase layer and its searchable records.
+     */
+    public function drainase(): ResponseInterface
+    {
+        return redirect()->to(site_url('Welcome/digital') . '#drainase');
+    }
+
     public function digital(): string
     {
         $map = model(MapModel::class);
