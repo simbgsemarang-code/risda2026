@@ -43,7 +43,7 @@ class MapModel extends Model
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array<int, object>
      */
     public function options(string $table, array $columns, ?string $whereColumn = null, mixed $whereValue = null): array
     {
@@ -52,7 +52,10 @@ class MapModel extends Model
             $builder->where($whereColumn, $whereValue);
         }
 
-        return $builder->get()->getResultArray();
+        // The map select views use object properties (for example $row->id).
+        // Keep this legacy-compatible result shape while other data methods
+        // intentionally return arrays.
+        return $builder->get()->getResult();
     }
 
     public function featureCount(string $table, ?string $field = null, mixed $value = null): int
