@@ -18,6 +18,8 @@ class Detail extends BaseController
     ];
 
     public function drainase(string $id): string { return $this->simple('drainase', $id); }
+    public function bendung(string $id): string { return $this->generic('bendung', 'Point', $id, 'Detail Bendung', 1); }
+    public function irigasi(string $id): string { return $this->generic('irigasi', 'MultiLineString', $id, 'Detail Saluran Irigasi', 1); }
     public function pembuang(string $id): string { return $this->simple('pembuang', $id); }
     public function p_pembuang(string $id): string { return $this->simple('p_pembuang', $id); }
     public function air_baku(string $id): string { return $this->simple('air_baku', $id); }
@@ -47,6 +49,23 @@ class Detail extends BaseController
         ]);
 
         return view('layouts/main', ['c' => $classes, 'visitorTotal' => 0, 'content' => $content]);
+    }
+
+    /** Lightweight fallbacks for legacy detail screens that previously loaded every related layer. */
+    private function generic(string $table, string $geometry, string $id, string $title, int $activeIndex): string
+    {
+        $feature = model(MapModel::class)->geoJsonFeatures($table, $geometry, 'id', $id)[0] ?? null;
+        if ($feature === null) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $classes = array_fill(0, 9, 'nav-item nav-link');
+        $classes[$activeIndex] = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
+        return view('layouts/main', [
+            'c' => $classes,
+            'visitorTotal' => 0,
+            'content' => view('detail_generic', ['title' => $title, 'data' => $feature['properties']]),
+        ]);
     }
 
     /** Legacy scripts interpolate comma-separated GeoJSON feature objects. */

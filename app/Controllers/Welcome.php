@@ -147,6 +147,21 @@ class Welcome extends BaseController
         return $this->optionHtml('desa', 'id_kecamatan', $kecamatanId, 'id', 'DESA');
     }
 
+    public function cari_desa(string $id, string $type): ResponseInterface
+    {
+        $tables = [
+            'drainase' => 'desa_drainase',
+            'pembuang' => 'desa',
+        ];
+        if (!isset($tables[$type])) {
+            return $this->response->setStatusCode(400)->setJSON(['message' => 'Jenis data tidak valid.']);
+        }
+
+        return $this->response->setJSON(
+            model(MapModel::class)->geoJsonFeatures($tables[$type], 'MultiPolygon', 'id', $id)
+        );
+    }
+
     public function cari_kemantren1(string $uptd): string
     {
         return $this->optionHtml('kemantren', 'uptd', $uptd, 'id', 'kemantren');
@@ -258,6 +273,13 @@ class Welcome extends BaseController
             'visitorTotal' => 0,
             'content' => view('admin_login', ['alert' => (string) session()->getFlashdata('login_error'), 'captcha' => $captcha]),
         ]);
+    }
+
+    /** Small legacy modal used by detail pages. */
+    public function hm(string $id): string
+    {
+        $row = Database::connect()->table('kondisi')->where('id', $id)->get()->getRowArray() ?? [];
+        return view('hm', ['row' => $row]);
     }
 
     private function jsonFeatures(string $table, string $geometry, ?string $field = null, mixed $value = null): ResponseInterface
