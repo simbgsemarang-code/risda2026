@@ -6,7 +6,11 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
+$routes->get('Welcome/di', 'Welcome::di');
 $routes->get('Welcome/drainase', 'Welcome::drainase');
+$routes->get('Welcome/pembuang', 'Welcome::pembuang');
+$routes->get('Welcome/air_baku', 'Welcome::air_baku');
+$routes->get('Welcome/statistik/(:segment)/(:segment)', 'Welcome::statistik/$1/$2');
 $routes->get('Welcome/digital/layer/(:segment)', 'DigitalMap::layer/$1');
 $routes->get('Welcome/digital', 'Welcome::digital');
 $routes->get('Welcome/layer_di/(:segment)', 'Welcome::layer_di/$1');

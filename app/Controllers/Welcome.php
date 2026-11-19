@@ -21,6 +21,36 @@ class Welcome extends BaseController
     ];
 
     /**
+     * Lightweight replacement for the legacy DI page. It deliberately loads
+     * only a small searchable list, not every GeoJSON feature at page load.
+     */
+    public function di(): string
+    {
+        $keyword = trim((string) $this->request->getGet('q'));
+        $builder = Database::connect()
+            ->table('bendung')
+            ->select('id_di, NAMA_DI')
+            ->distinct()
+            ->orderBy('NAMA_DI', 'ASC');
+
+        if ($keyword !== '') {
+            $builder->like('NAMA_DI', $keyword, 'both');
+        }
+
+        $items = $builder->limit(31)->get()->getResultArray();
+        $hasMore = count($items) > 30;
+        $items = array_slice($items, 0, 30);
+        $inactive = 'nav-item nav-link';
+        $active = 'btn btn-primary rounded-pill py-2 px-4 ms-3 flex-shrink-0';
+
+        return view('layouts/main', [
+            'c' => [$inactive, $active, $inactive, $inactive, $inactive, $inactive, $inactive, $inactive, $inactive],
+            'visitorTotal' => 0,
+            'content' => view('di_light', compact('items', 'keyword', 'hasMore')),
+        ]);
+    }
+
+    /**
      * Legacy public URL retained for links that were published while the
      * application still used CI3. The digital map is the CI4 replacement and
      * contains the drainase layer and its searchable records.
@@ -28,6 +58,22 @@ class Welcome extends BaseController
     public function drainase(): ResponseInterface
     {
         return redirect()->to(site_url('Welcome/digital') . '#drainase');
+    }
+
+    /** Keep legacy public menu URLs usable while their spatial data loads on demand. */
+    public function pembuang(): ResponseInterface
+    {
+        return redirect()->to(site_url('Welcome/digital') . '#pembuang');
+    }
+
+    public function air_baku(): ResponseInterface
+    {
+        return redirect()->to(site_url('Welcome/digital') . '#air-baku');
+    }
+
+    public function statistik(string $uptd = 'all', string $ajax = 'no'): ResponseInterface
+    {
+        return redirect()->to(site_url('Welcome/digital') . '#statistik');
     }
 
     public function digital(): string
